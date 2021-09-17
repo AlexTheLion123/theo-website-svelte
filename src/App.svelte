@@ -4,7 +4,7 @@
 
 <p>Hello {name}</p>
 
-<style lang="scss"> 
+<style> 
 	
 </style>
 
