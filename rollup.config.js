@@ -24,7 +24,9 @@ export default {
             preprocess: sveltePreprocess({ // uses auto-preprocessing mode, i.e. have to specify lang='scss' inline. 
                 sourcemap: !production
             }), // NOTE: have to install speciic languages, e.g. npm install -D node-sass. https://github.com/sveltejs/svelte-preprocess/blob/main/docs/getting-started.md
-            dev: !production // enables run-time checks when not in production
+            compilerOptions: {
+                dev: !production // enables run-time checks when not in production
+            }
         }),
         css({
             output: 'bundle.css'
