@@ -20,7 +20,7 @@ export default {
     // },
     plugins: [
         svelte({
-            include: 'src/*.svelte',
+            // by default, all svelte files are compiled
             preprocess: sveltePreprocess({ // uses auto-preprocessing mode, i.e. have to specify lang='scss' inline. 
                 sourcemap: !production
             }), // NOTE: have to install speciic languages, e.g. npm install -D node-sass. https://github.com/sveltejs/svelte-preprocess/blob/main/docs/getting-started.md
