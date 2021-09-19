@@ -1,8 +1,10 @@
 <script>
+	import Nav from './components/Nav.svelte';
+
 	export let name;
 </script>
 
-<h1>Hello {name}</h1>
+<Nav/>
 
 <style> 
 	

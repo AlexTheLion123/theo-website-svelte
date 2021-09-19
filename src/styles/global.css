@@ -1,0 +1,18 @@
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
+
+:root {
+    --lightWhite: #fafafa;
+    --h3Color: #282828;
+    --spanColor: #767879;
+    --paragraphColor: #666;
+    --lightDark: rgb(239, 239, 239);
+    --iconColor: rgb(87, 57, 187);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+}

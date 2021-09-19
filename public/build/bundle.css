@@ -1,3 +1,22 @@
 html, body {
     margin: 0;
 }
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
+
+:root {
+    --lightWhite: #fafafa;
+    --h3Color: #282828;
+    --spanColor: #767879;
+    --paragraphColor: #666;
+    --lightDark: rgb(239, 239, 239);
+    --iconColor: rgb(87, 57, 187);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+}
+nav.svelte-1dlwdcn.svelte-1dlwdcn{height:300px;background:url("../images/sub_visual.jpg") no-repeat center;background-size:cover}nav.svelte-1dlwdcn ul.svelte-1dlwdcn{display:flex;list-style:none;z-index:3}nav.svelte-1dlwdcn ul li.svelte-1dlwdcn{margin:0 5px}nav.svelte-1dlwdcn ul li a.svelte-1dlwdcn{color:#fff;text-decoration:none;font-size:18px;font-weight:500;letter-spacing:1px;padding:8px 10px;border-radius:5px;transition:all 0.3s ease}nav.svelte-1dlwdcn ul li a.svelte-1dlwdcn:hover,nav.svelte-1dlwdcn ul li a a.active.svelte-1dlwdcn{color:#1b1b1b;background:#fff}nav.svelte-1dlwdcn .logo.svelte-1dlwdcn{font-size:22px;color:#fff;font-weight:600}nav.svelte-1dlwdcn div.heading.svelte-1dlwdcn{color:white;font-weight:500;position:absolute;display:flex;justify-content:center;align-items:center;bottom:5vh;width:100%;text-align:center;bottom:100px;font-size:50px;line-height:32px}nav.svelte-1dlwdcn .logo.svelte-1dlwdcn,nav.svelte-1dlwdcn ul.svelte-1dlwdcn,nav.svelte-1dlwdcn .menu-btn i.svelte-1dlwdcn{padding:20px;font-size:30px}nav.svelte-1dlwdcn .menu-btn i.svelte-1dlwdcn{color:#fff;font-size:22px;cursor:pointer;display:none}.container.svelte-1dlwdcn.svelte-1dlwdcn{width:100%;max-width:1200px;margin:0 auto;height:100%}div.svelte-1dlwdcn .container-wrap.svelte-1dlwdcn{display:flex;justify-content:space-between;align-items:flex-start;position:relative;height:100%}#click.svelte-1dlwdcn.svelte-1dlwdcn{display:none}
