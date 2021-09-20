@@ -1,5 +1,6 @@
 <script>
-
+	let menuItems = [{label: "Home"}, {label:"Courses"}, {label:"Team"}, {label:"About"},{label:"Contact"}]
+	let current="Home";
 </script>
 
 
@@ -13,14 +14,20 @@
 			</label>
 				
 			<ul>
-				<li><a class='active' href="index.html">Home</a></li>
-				<li><a href="courses.html">Courses</a></li>
-				<li><a href="team.html">Team</a></li>
-				<li><a href="about.html">About</a></li>
-				<li><a href="contact.html">Contact</a></li>
+				{#each menuItems as item}
+					<li>
+						<a href="nowhere.html"
+							class:active={current===item.label}
+							on:click|preventDefault={()=>{
+								return current = item.label;
+							}}
+						>{item.label}
+						</a>
+					</li>
+				{/each}
 			</ul>
 	
-			<div class="heading">HOME</div>
+			<div class="heading">{current}</div>
 		</div>
 		
 	</div>
@@ -50,11 +57,13 @@
 					border-radius: 5px;
 					transition: all 0.3s ease;
 
-					&:hover,
-					a.active{
+					
+					
+				}
+				a:hover,
+				a.active{
 						color: #1b1b1b;
 						background: #fff;
-					}
 				}
 			}
 		}
@@ -91,6 +100,66 @@
 			cursor: pointer;
 			display: none;
 		}
+
+		@media (max-width: 950px){
+			.menu-btn i{
+				display: block;
+			}
+			
+			ul {
+				position: fixed;
+				top: 80px;
+				left: -100%;
+				background: #111;
+				height: 100vh;
+				width: 100%;
+				display: block;
+				text-align: center;
+				transition: all 0.3s ease;
+
+				li {
+					margin: 40px 0;
+
+					a {
+						font-size: 20px;
+
+						&:hover,
+						.active {
+							color: cyan;
+							background: none;
+						}
+					}
+				}
+			}
+			#click:checked ~ ul{
+				left: 0;
+			}
+		}
+
+		@media (max-width: 767px) {
+			height: 160px;
+			
+			div.heading {
+				bottom: 50px;
+				font-size: 33px;
+				line-height: 32px;
+			}
+		}
+
+		@media (max-width: 575px){
+			height: 160px;
+
+			.logo, ul, .menu-btn i {
+				padding: 20px;
+				font-size: 20px;
+			}
+
+			div.heading {
+				bottom: 40px;
+				font-size: 30px;
+				line-height: 32px;
+			}
+		}
 	}
 
 	.container {
@@ -108,19 +177,22 @@
 		height: 100%;
 	}
 
-	.btn {
-		padding: 5px 15px;
-		cursor: pointer;
-		font-size: 14px;
-		font-weight: 500;
-		border: 0;
-		outline:0;
-	}
+	// .btn {
+	// 	padding: 5px 15px;
+	// 	cursor: pointer;
+	// 	font-size: 14px;
+	// 	font-weight: 500;
+	// 	border: 0;
+	// 	outline:0;
+	// }
 	
 	#click{
 		display: none;
 	}
 
 	
+
+
+
 
 </style>

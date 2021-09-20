@@ -36,6 +36,12 @@
     function detach(node) {
         node.parentNode.removeChild(node);
     }
+    function destroy_each(iterations, detaching) {
+        for (let i = 0; i < iterations.length; i += 1) {
+            if (iterations[i])
+                iterations[i].d(detaching);
+        }
+    }
     function element(name) {
         return document.createElement(name);
     }
@@ -45,6 +51,17 @@
     function space() {
         return text(' ');
     }
+    function listen(node, event, handler, options) {
+        node.addEventListener(event, handler, options);
+        return () => node.removeEventListener(event, handler, options);
+    }
+    function prevent_default(fn) {
+        return function (event) {
+            event.preventDefault();
+            // @ts-ignore
+            return fn.call(this, event);
+        };
+    }
     function attr(node, attribute, value) {
         if (value == null)
             node.removeAttribute(attribute);
@@ -53,6 +70,9 @@
     }
     function children(element) {
         return Array.from(element.childNodes);
+    }
+    function toggle_class(element, name, toggle) {
+        element.classList[toggle ? 'add' : 'remove'](name);
     }
     function custom_event(type, detail, bubbles = false) {
         const e = document.createEvent('CustomEvent');
@@ -296,12 +316,41 @@
         dispatch_dev('SvelteDOMRemove', { node });
         detach(node);
     }
+    function listen_dev(node, event, handler, options, has_prevent_default, has_stop_propagation) {
+        const modifiers = options === true ? ['capture'] : options ? Array.from(Object.keys(options)) : [];
+        if (has_prevent_default)
+            modifiers.push('preventDefault');
+        if (has_stop_propagation)
+            modifiers.push('stopPropagation');
+        dispatch_dev('SvelteDOMAddEventListener', { node, event, handler, modifiers });
+        const dispose = listen(node, event, handler, options);
+        return () => {
+            dispatch_dev('SvelteDOMRemoveEventListener', { node, event, handler, modifiers });
+            dispose();
+        };
+    }
     function attr_dev(node, attribute, value) {
         attr(node, attribute, value);
         if (value == null)
             dispatch_dev('SvelteDOMRemoveAttribute', { node, attribute });
         else
             dispatch_dev('SvelteDOMSetAttribute', { node, attribute, value });
+    }
+    function set_data_dev(text, data) {
+        data = '' + data;
+        if (text.wholeText === data)
+            return;
+        dispatch_dev('SvelteDOMSetData', { node: text, data });
+        text.data = data;
+    }
+    function validate_each_argument(arg) {
+        if (typeof arg !== 'string' && !(arg && typeof arg === 'object' && 'length' in arg)) {
+            let msg = '{#each} only iterates over array-like objects.';
+            if (typeof Symbol === 'function' && arg && Symbol.iterator in arg) {
+                msg += ' You can use a spread to convert this iterable into an array.';
+            }
+            throw new Error(msg);
+        }
     }
     function validate_slots(name, slot, keys) {
         for (const slot_key of Object.keys(slot)) {
@@ -334,6 +383,75 @@
 
     const file = "src/components/Nav.svelte";
 
+    function get_each_context(ctx, list, i) {
+    	const child_ctx = ctx.slice();
+    	child_ctx[3] = list[i];
+    	return child_ctx;
+    }
+
+    // (17:4) {#each menuItems as item}
+    function create_each_block(ctx) {
+    	let li;
+    	let a;
+    	let t0_value = /*item*/ ctx[3].label + "";
+    	let t0;
+    	let t1;
+    	let mounted;
+    	let dispose;
+
+    	function click_handler() {
+    		return /*click_handler*/ ctx[2](/*item*/ ctx[3]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			li = element("li");
+    			a = element("a");
+    			t0 = text(t0_value);
+    			t1 = space();
+    			attr_dev(a, "href", "nowhere.html");
+    			attr_dev(a, "class", "svelte-12273nj");
+    			toggle_class(a, "active", /*current*/ ctx[0] === /*item*/ ctx[3].label);
+    			add_location(a, file, 18, 6, 442);
+    			attr_dev(li, "class", "svelte-12273nj");
+    			add_location(li, file, 17, 5, 431);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, li, anchor);
+    			append_dev(li, a);
+    			append_dev(a, t0);
+    			append_dev(li, t1);
+
+    			if (!mounted) {
+    				dispose = listen_dev(a, "click", prevent_default(click_handler), false, true, false);
+    				mounted = true;
+    			}
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+
+    			if (dirty & /*current, menuItems*/ 3) {
+    				toggle_class(a, "active", /*current*/ ctx[0] === /*item*/ ctx[3].label);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(li);
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_each_block.name,
+    		type: "each",
+    		source: "(17:4) {#each menuItems as item}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
     function create_fragment$1(ctx) {
     	let nav;
     	let div3;
@@ -346,22 +464,16 @@
     	let i;
     	let t3;
     	let ul;
-    	let li0;
-    	let a0;
-    	let t5;
-    	let li1;
-    	let a1;
-    	let t7;
-    	let li2;
-    	let a2;
-    	let t9;
-    	let li3;
-    	let a3;
-    	let t11;
-    	let li4;
-    	let a4;
-    	let t13;
+    	let t4;
     	let div1;
+    	let t5;
+    	let each_value = /*menuItems*/ ctx[1];
+    	validate_each_argument(each_value);
+    	let each_blocks = [];
+
+    	for (let i = 0; i < each_value.length; i += 1) {
+    		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+    	}
 
     	const block = {
     		c: function create() {
@@ -377,74 +489,35 @@
     			i = element("i");
     			t3 = space();
     			ul = element("ul");
-    			li0 = element("li");
-    			a0 = element("a");
-    			a0.textContent = "Home";
-    			t5 = space();
-    			li1 = element("li");
-    			a1 = element("a");
-    			a1.textContent = "Courses";
-    			t7 = space();
-    			li2 = element("li");
-    			a2 = element("a");
-    			a2.textContent = "Team";
-    			t9 = space();
-    			li3 = element("li");
-    			a3 = element("a");
-    			a3.textContent = "About";
-    			t11 = space();
-    			li4 = element("li");
-    			a4 = element("a");
-    			a4.textContent = "Contact";
-    			t13 = space();
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].c();
+    			}
+
+    			t4 = space();
     			div1 = element("div");
-    			div1.textContent = "HOME";
-    			attr_dev(div0, "class", "logo svelte-1dlwdcn");
-    			add_location(div0, file, 8, 3, 87);
+    			t5 = text(/*current*/ ctx[0]);
+    			attr_dev(div0, "class", "logo svelte-12273nj");
+    			add_location(div0, file, 9, 3, 212);
     			attr_dev(input, "type", "checkbox");
     			attr_dev(input, "id", "click");
-    			attr_dev(input, "class", "svelte-1dlwdcn");
-    			add_location(input, file, 9, 3, 139);
-    			attr_dev(i, "class", "fas fa-bars svelte-1dlwdcn");
-    			add_location(i, file, 11, 4, 218);
+    			attr_dev(input, "class", "svelte-12273nj");
+    			add_location(input, file, 10, 3, 264);
+    			attr_dev(i, "class", "fas fa-bars svelte-12273nj");
+    			add_location(i, file, 12, 4, 343);
     			attr_dev(label, "for", "click");
     			attr_dev(label, "class", "menu-btn");
-    			add_location(label, file, 10, 3, 177);
-    			attr_dev(a0, "class", "active svelte-1dlwdcn");
-    			attr_dev(a0, "href", "index.html");
-    			add_location(a0, file, 15, 8, 279);
-    			attr_dev(li0, "class", "svelte-1dlwdcn");
-    			add_location(li0, file, 15, 4, 275);
-    			attr_dev(a1, "href", "courses.html");
-    			attr_dev(a1, "class", "svelte-1dlwdcn");
-    			add_location(a1, file, 16, 8, 337);
-    			attr_dev(li1, "class", "svelte-1dlwdcn");
-    			add_location(li1, file, 16, 4, 333);
-    			attr_dev(a2, "href", "team.html");
-    			attr_dev(a2, "class", "svelte-1dlwdcn");
-    			add_location(a2, file, 17, 8, 385);
-    			attr_dev(li2, "class", "svelte-1dlwdcn");
-    			add_location(li2, file, 17, 4, 381);
-    			attr_dev(a3, "href", "about.html");
-    			attr_dev(a3, "class", "svelte-1dlwdcn");
-    			add_location(a3, file, 18, 8, 427);
-    			attr_dev(li3, "class", "svelte-1dlwdcn");
-    			add_location(li3, file, 18, 4, 423);
-    			attr_dev(a4, "href", "contact.html");
-    			attr_dev(a4, "class", "svelte-1dlwdcn");
-    			add_location(a4, file, 19, 8, 471);
-    			attr_dev(li4, "class", "svelte-1dlwdcn");
-    			add_location(li4, file, 19, 4, 467);
-    			attr_dev(ul, "class", "svelte-1dlwdcn");
-    			add_location(ul, file, 14, 3, 266);
-    			attr_dev(div1, "class", "heading svelte-1dlwdcn");
-    			add_location(div1, file, 22, 3, 525);
-    			attr_dev(div2, "class", "container-wrap svelte-1dlwdcn");
-    			add_location(div2, file, 7, 2, 55);
-    			attr_dev(div3, "class", "container svelte-1dlwdcn");
-    			add_location(div3, file, 6, 1, 29);
-    			attr_dev(nav, "class", "svelte-1dlwdcn");
-    			add_location(nav, file, 5, 0, 22);
+    			add_location(label, file, 11, 3, 302);
+    			attr_dev(ul, "class", "svelte-12273nj");
+    			add_location(ul, file, 15, 3, 391);
+    			attr_dev(div1, "class", "heading svelte-12273nj");
+    			add_location(div1, file, 29, 3, 661);
+    			attr_dev(div2, "class", "container-wrap svelte-12273nj");
+    			add_location(div2, file, 8, 2, 180);
+    			attr_dev(div3, "class", "container svelte-12273nj");
+    			add_location(div3, file, 7, 1, 154);
+    			attr_dev(nav, "class", "svelte-12273nj");
+    			add_location(nav, file, 6, 0, 147);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -461,28 +534,47 @@
     			append_dev(label, i);
     			append_dev(div2, t3);
     			append_dev(div2, ul);
-    			append_dev(ul, li0);
-    			append_dev(li0, a0);
-    			append_dev(ul, t5);
-    			append_dev(ul, li1);
-    			append_dev(li1, a1);
-    			append_dev(ul, t7);
-    			append_dev(ul, li2);
-    			append_dev(li2, a2);
-    			append_dev(ul, t9);
-    			append_dev(ul, li3);
-    			append_dev(li3, a3);
-    			append_dev(ul, t11);
-    			append_dev(ul, li4);
-    			append_dev(li4, a4);
-    			append_dev(div2, t13);
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].m(ul, null);
+    			}
+
+    			append_dev(div2, t4);
     			append_dev(div2, div1);
+    			append_dev(div1, t5);
     		},
-    		p: noop,
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*current, menuItems*/ 3) {
+    				each_value = /*menuItems*/ ctx[1];
+    				validate_each_argument(each_value);
+    				let i;
+
+    				for (i = 0; i < each_value.length; i += 1) {
+    					const child_ctx = get_each_context(ctx, each_value, i);
+
+    					if (each_blocks[i]) {
+    						each_blocks[i].p(child_ctx, dirty);
+    					} else {
+    						each_blocks[i] = create_each_block(child_ctx);
+    						each_blocks[i].c();
+    						each_blocks[i].m(ul, null);
+    					}
+    				}
+
+    				for (; i < each_blocks.length; i += 1) {
+    					each_blocks[i].d(1);
+    				}
+
+    				each_blocks.length = each_value.length;
+    			}
+
+    			if (dirty & /*current*/ 1) set_data_dev(t5, /*current*/ ctx[0]);
+    		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(nav);
+    			destroy_each(each_blocks, detaching);
     		}
     	};
 
@@ -497,16 +589,41 @@
     	return block;
     }
 
-    function instance$1($$self, $$props) {
+    function instance$1($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Nav', slots, []);
+
+    	let menuItems = [
+    		{ label: "Home" },
+    		{ label: "Courses" },
+    		{ label: "Team" },
+    		{ label: "About" },
+    		{ label: "Contact" }
+    	];
+
+    	let current = "Home";
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Nav> was created with unknown prop '${key}'`);
     	});
 
-    	return [];
+    	const click_handler = item => {
+    		return $$invalidate(0, current = item.label);
+    	};
+
+    	$$self.$capture_state = () => ({ menuItems, current });
+
+    	$$self.$inject_state = $$props => {
+    		if ('menuItems' in $$props) $$invalidate(1, menuItems = $$props.menuItems);
+    		if ('current' in $$props) $$invalidate(0, current = $$props.current);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [current, menuItems, click_handler];
     }
 
     class Nav extends SvelteComponentDev {
