@@ -1,6 +1,28 @@
 <script>
+	import { onMount } from "svelte";
+
 	let menuItems = [{label: "Home"}, {label:"Courses"}, {label:"Team"}, {label:"About"},{label:"Contact"}]
 	let current="Home";
+	let showMobileMenu = false;
+	let menuIn = false;
+
+	const handleMobileIconClick = () => (showMobileMenu = !showMobileMenu);
+
+	const mediaQueryHandler = e => { // whether to show icon or not
+		if (!e.matches) {
+			showMobileMenu = false;
+		}
+	};
+
+	const slideMenu = () => { // whether to show menu or not
+		const ul = document.querySelector('ul');
+		!menuIn ? ul.style.left = '0' : ul.style.left = '-100%';
+	}
+
+	onMount(() => {
+		const mediaListener = window.matchMedia("(max-width: 767px)");
+		mediaListener.addListener(mediaQueryHandler);
+	});
 </script>
 
 
@@ -8,10 +30,14 @@
 	<div class="container">
 		<div class="container-wrap">
 			<div class="logo">EPIC ICT TRAINING CENTRE</div>
-			<input type="checkbox" id="click">
-			<label for="click" class="menu-btn">
-				<i class="fas fa-bars"></i>
-			</label>
+
+			<i 
+				class="fas fa-bars"
+				on:click={() => {
+					menuIn = !menuIn;
+					slideMenu()	
+				} }
+			></i>
 				
 			<ul>
 				{#each menuItems as item}
@@ -56,9 +82,6 @@
 					padding: 8px 10px;
 					border-radius: 5px;
 					transition: all 0.3s ease;
-
-					
-					
 				}
 				a:hover,
 				a.active{
@@ -89,12 +112,12 @@
 			font-size: 50px;
 			line-height: 32px;
 		}
-		.logo, ul, .menu-btn i {
+		.lo i {
 			padding: 20px;
 			font-size: 30px;
 		}
 
-		.menu-btn i { 
+	 i { 
 			color: #fff;
 			font-size: 22px;
 			cursor: pointer;
@@ -102,7 +125,7 @@
 		}
 
 		@media (max-width: 950px){
-			.menu-btn i{
+		 	i{
 				display: block;
 			}
 			
@@ -131,9 +154,6 @@
 					}
 				}
 			}
-			#click:checked ~ ul{
-				left: 0;
-			}
 		}
 
 		@media (max-width: 767px) {
@@ -149,7 +169,7 @@
 		@media (max-width: 575px){
 			height: 160px;
 
-			.logo, ul, .menu-btn i {
+			.logo, ul, i {
 				padding: 20px;
 				font-size: 20px;
 			}
@@ -175,6 +195,7 @@
 		align-items: flex-start;
 		position: relative;
 		height: 100%;
+		padding: 20px;
 	}
 
 	// .btn {
@@ -186,9 +207,6 @@
 	// 	outline:0;
 	// }
 	
-	#click{
-		display: none;
-	}
 
 	
 
